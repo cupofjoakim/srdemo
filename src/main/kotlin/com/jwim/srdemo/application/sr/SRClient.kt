@@ -33,7 +33,6 @@ class SRClient(val restTemplate: RestTemplate) {
     }
 
     private fun getShowsFromApi(): SRProgramsDTO {
-        // Unlikely to change often, cache for 1 hour?
         rateLimiter.acquire()
         logger.info("Fetching all programs from SR")
         return restTemplate
