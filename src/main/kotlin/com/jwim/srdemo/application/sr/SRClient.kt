@@ -9,36 +9,34 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 @Service
-class SRClient {
-    private final val baseUrl = "https://api.sr.se/api/v2/"
+class SRClient(val restTemplate: RestTemplate) {
+    private final val baseUrl = "https://api.sr.se/api/v2"
     private final val formatParam = "&format=json"
     private final val rateLimiter = RateLimiter.create(3.0)
-
     private val logger = LoggerFactory.getLogger(SRClient::class.java)
-
     private val showSupplier = Suppliers.memoizeWithExpiration({
-        getShows()
+        getShowsFromApi()
     }, 1, TimeUnit.MINUTES)
 
     fun getLatestEpisodeForShow(showId: Int): SRLastEpisodeDTO {
         rateLimiter.acquire()
         logger.info("Fetching latest episode for show with id $showId from SR")
-        return RestTemplate()
+        return restTemplate
             .getForObject(
                 "$baseUrl/episodes/getlatest?programid=$showId$formatParam",
                 SRLastEpisodeDTO::class.java
             ) ?: throw IOException()
     }
 
-    fun getShowsMemoized(): SRProgramsDTO {
+    fun getShows(): SRProgramsDTO {
         return showSupplier.get()
     }
 
-    fun getShows(): SRProgramsDTO {
+    private fun getShowsFromApi(): SRProgramsDTO {
         // Unlikely to change often, cache for 1 hour?
         rateLimiter.acquire()
         logger.info("Fetching all programs from SR")
-        return RestTemplate()
+        return restTemplate
             .getForObject(
                 "$baseUrl/programs/index?pagination=false$formatParam",
                 SRProgramsDTO::class.java

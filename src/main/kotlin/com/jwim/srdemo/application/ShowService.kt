@@ -23,7 +23,8 @@ class ShowService(val srClient: SRClient) {
     /**
      * Returns a parsed Date from the given [microsoftDate].
      *
-     * Needed due to SR returning a date in the Microsoft Json Date format (ex. "/Date(1623936600000)/")
+     * "Needed" due to SR returning a date in the Microsoft Json Date format (ex. "/Date(1623936600000)/")
+     * Needed is in quotation marks as it could've been a feature to keep passing it, but I'd rather not :)
      */
     private fun convertMicrosoftJsonDateToDate(microsoftDate: String): Date {
         val regex = Regex("([0-9]+)")
@@ -32,7 +33,7 @@ class ShowService(val srClient: SRClient) {
     }
 
     private fun findShowByName(showName: String): SRProgramDTO {
-        return srClient.getShowsMemoized().programs.find {
+        return srClient.getShows().programs.find {
             it.name.equals(showName, ignoreCase = true)
         } ?: throw ShowNotFoundException()
     }
