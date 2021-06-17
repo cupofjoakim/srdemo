@@ -1,0 +1,8 @@
+### Get latest episode
+GET http://localhost:8080/shows/Nyheter P4 Kalmar/latest
+
+### Get show with lower case name
+GET http://localhost:8080/shows/mammas nya kille/latest
+
+### Get non existent show
+GET http://localhost:8080/shows/asdasdasdasd/latest
